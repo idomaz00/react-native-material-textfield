@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import { Animated } from 'react-native';
+import { Animated, Dimensions } from 'react-native';
 
 export default class Label extends PureComponent {
   static defaultProps = {
@@ -43,6 +43,7 @@ export default class Label extends PureComponent {
     this.state = {
       input: new Animated.Value(this.inputState()),
       focus: new Animated.Value(this.focusState()),
+      leftInset: 0,
     };
   }
 
@@ -75,8 +76,12 @@ export default class Label extends PureComponent {
     return errored? -1 : (focused? 1 : 0);
   }
 
+  measureView = (event) =>{
+    this.setState({ leftInset: event.nativeEvent.layout.width*0.5 });
+  }
+
   render() {
-    let { focus, input } = this.state;
+    let { focus, input, leftInset } = this.state;
     let {
       children,
       restricted,
@@ -122,10 +127,11 @@ export default class Label extends PureComponent {
     let containerStyle = {
       position: 'absolute',
       top,
+      left: -leftInset,
     };
 
     return (
-      <Animated.View style={containerStyle}>
+      <Animated.View style={containerStyle} onLayout={(event) => this.measureView(event)}>
         <Animated.Text style={[style, textStyle]} {...props}>
           {children}
         </Animated.Text>
